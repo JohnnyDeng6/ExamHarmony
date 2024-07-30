@@ -40,7 +40,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/admin")
-public class Admin {
+public class AdminController {
 
     @Autowired
     private examSlotRepository examRepo;
@@ -133,44 +133,6 @@ public class Admin {
         return "admin/adminHome";
     }
 
-//    @Autowired
-//    private CalendarManagementService calendarManagementService;
-//
-//    @GetMapping("/createEvent")
-//    public String creatEvent(Model model) {
-//        return "form";
-//    }
-
-//   @GetMapping("/shareCal")
-//   public String shareCal(Model model) throws Exception {
-//       String calendarId = "examharmony6@gmail.com";
-////       String calendarId = "42a120091e519ed6d2e9d6372d5cfb188ee4d14d6362c7c8527192fc10b67994@group.calendar.google.com";
-//       List<String> allEmails = userRepository.findAllEmailAddresses();
-//       calendarManagementService.shareCalendarWithUsers(calendarId, allEmails);
-//       System.out.println("HERE");
-//       return "redirect:/admin/home";
-//   }
-//
-//    @PostMapping("/createEvent")
-//    public String createEvent(
-//            @RequestParam String summary,
-//            @RequestParam String description,
-//            @RequestParam String location,
-//            @RequestParam String startDateTime,
-//            @RequestParam String endDateTime,
-//            Model model) {
-//        try {
-////            String calendarId = "42a120091e519ed6d2e9d6372d5cfb188ee4d14d6362c7c8527192fc10b67994@group.calendar.google.com";
-//            String calendarId = "examharmony6@gmail.com";
-//            calendarManagementService.createEvent(calendarId, summary, description, location, startDateTime, endDateTime);
-//            model.addAttribute("message", "Event created successfully");
-//            return "eventSuccess";
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            model.addAttribute("alertMessage", "Error occurred while creating the event.");
-//            return "redirect:/admin/home";
-//        }
-//    }
 
     @GetMapping("/calendar")
     public String getCalendar(Model model) {

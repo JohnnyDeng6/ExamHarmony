@@ -17,12 +17,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.UUID;
 
-// When an admin creates an account, assume they know the person’s email
-    // and create a temporary password, role(s), and username for them,
-    // then they are sent the email with their account,
-    // from then they can log in and change their password or username
-
-    //create tmp pw,
     @Controller
     public class RegistrationController {
 
@@ -54,7 +48,6 @@ import java.util.UUID;
                 //if role is inv then share or admin
                 if (registrationDto.getRoles().contains("INVIGILATOR") || registrationDto.getRoles().contains("ADMIN")) {
                     String calendarId = "examharmony6@gmail.com";
-//                    String calendarId = "42a120091e519ed6d2e9d6372d5cfb188ee4d14d6362c7c8527192fc10b67994@group.calendar.google.com";
                     calendarManagementService.shareCalendarWithUser(calendarId, toEmail);
                 }
 
