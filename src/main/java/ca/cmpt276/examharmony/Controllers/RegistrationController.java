@@ -3,6 +3,7 @@ package ca.cmpt276.examharmony.Controllers;
 import ca.cmpt276.examharmony.Model.emailSender.EmailService;
 import ca.cmpt276.examharmony.Model.registration.UserRegistrationDto;
 import ca.cmpt276.examharmony.Model.user.UserService;
+import ca.cmpt276.examharmony.calendarUtils.CalendarManagementService;
 import ca.cmpt276.examharmony.utils.UserAlreadyExistException;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpSession;
@@ -33,6 +34,9 @@ import java.util.UUID;
         @Autowired
         private EmailService emailService;
 
+        @Autowired
+        private CalendarManagementService calendarManagementService;
+
         @GetMapping("/admin/register")
         public String showRegistrationForm(Model model) {
             model.addAttribute("user", new UserRegistrationDto());
@@ -49,10 +53,17 @@ import java.util.UUID;
                 String body = buildWelcomeEmailBody(registrationDto, prtUUID);
                 emailService.sendHtmlEmail(toEmail, subject, body);
 
+                //if role is inv then share or admin
+                if (registrationDto.getRoles().contains("INVIGILATOR") || registrationDto.getRoles().contains("ADMIN")) {
+                    String calendarId = "examharmony6@gmail.com";
+//                    String calendarId = "42a120091e519ed6d2e9d6372d5cfb188ee4d14d6362c7c8527192fc10b67994@group.calendar.google.com";
+                    calendarManagementService.shareCalendarWithUser(calendarId, toEmail);
+                }
+
             } catch (UserAlreadyExistException uaeEx) {
                 redirectAttributes.addFlashAttribute("alertMessage", "Account already exists, please choose another email or username");
                 return "redirect:/admin/register";
-            } catch (MessagingException | NoSuchAlgorithmException e) {
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
             return "redirect:/admin/home";

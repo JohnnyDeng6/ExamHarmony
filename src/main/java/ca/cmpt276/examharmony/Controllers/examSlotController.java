@@ -1,5 +1,7 @@
 
 package ca.cmpt276.examharmony.Controllers;
+import ca.cmpt276.examharmony.calendarUtils.CalendarManagementService;
+import com.google.api.client.util.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
@@ -16,6 +18,9 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.ui.Model;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -28,6 +33,9 @@ public class examSlotController {
 
     @Autowired
     private CourseRepository courseRepo;
+
+    @Autowired
+    private CalendarManagementService calendarManagementService;
 
     @GetMapping("examSlot/Add")
     public String getAllCoursesSec(Model model){
@@ -46,9 +54,9 @@ public class examSlotController {
         model.addAttribute("examSlots", examSlot);
         return "/adminExamDisplay";
     }
-    
+
     @PostMapping("/admin/addExamSlot")
-    public String addExamSlot(@RequestParam Map<String, String> newExamSlot, HttpServletResponse response) {
+    public String addExamSlot(@RequestParam Map<String, String> newExamSlot, HttpServletResponse response) throws Exception {
 
         System.out.print("In addExamSlot");
 
@@ -57,8 +65,7 @@ public class examSlotController {
         int numOfRooms = Integer.parseInt(newExamSlot.get("numberOfRooms"));
         String assignedRooms = newExamSlot.get("assignedRooms");
         int numInvigilator = Integer.parseInt(newExamSlot.get("numberOfInvigilators"));
-        
-        
+
         String courseName = newExamSlot.get("courseID");
         
         System.out.print("courseName is "+courseName);
@@ -80,6 +87,18 @@ public class examSlotController {
         
         examRepo.save(exam);
 
+        String calendarId = "52ea1e5d777a891982013dc26653684dcf6c30520e5526be1cb60c0c34c01d10@group.calendar.google.com";
+        String summary = "Room number: " + numOfRooms + "\nRooms: " + assignedRooms + "\nNumber of Invigilators: " + numInvigilator;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS");
+
+        ZoneId zoneId = ZoneId.of("America/Vancouver");
+        ZonedDateTime zonedStartDateTime = StartTime.atZone(zoneId);
+        ZonedDateTime zonedEndDateTime = (StartTime.plusHours((long) duration)).atZone(zoneId);
+
+        DateTime startDateTime = new DateTime(zonedStartDateTime.toInstant().toEpochMilli());
+        DateTime endDateTime = new DateTime(zonedEndDateTime.toInstant().toEpochMilli());
+
+        calendarManagementService.createEvent(calendarId, summary, courseName, assignedRooms, startDateTime, endDateTime);
         response.setStatus(HttpServletResponse.SC_CREATED);
         
         return "redirect:/admin/examSlots";

@@ -16,6 +16,7 @@ import ca.cmpt276.examharmony.Model.user.User;
 import ca.cmpt276.examharmony.Model.user.UserRepository;
 import ca.cmpt276.examharmony.Model.examRequest.ExamSlotRequestService;
 
+import ca.cmpt276.examharmony.calendarUtils.CalendarManagementService;
 import ca.cmpt276.examharmony.utils.CustomUserDetails;
 import ca.cmpt276.examharmony.utils.DatabaseService;
 import ca.cmpt276.examharmony.utils.InstructorExamSlotRepository;
@@ -78,6 +79,45 @@ public class Admin {
     @Autowired
     private ExamSlotRequestService insService;
 
+    @Autowired
+    private CalendarManagementService calendarManagementService;
+
+    @GetMapping("/createEvent")
+    public String creatEvent(Model model) {
+        return "form";
+    }
+
+//   @GetMapping("/shareCal")
+//   public String shareCal(Model model) throws Exception {
+//       String calendarId = "examharmony6@gmail.com";
+////       String calendarId = "42a120091e519ed6d2e9d6372d5cfb188ee4d14d6362c7c8527192fc10b67994@group.calendar.google.com";
+//       List<String> allEmails = userRepository.findAllEmailAddresses();
+//       calendarManagementService.shareCalendarWithUsers(calendarId, allEmails);
+//       System.out.println("HERE");
+//       return "redirect:/admin/home";
+//   }
+//
+//    @PostMapping("/createEvent")
+//    public String createEvent(
+//            @RequestParam String summary,
+//            @RequestParam String description,
+//            @RequestParam String location,
+//            @RequestParam String startDateTime,
+//            @RequestParam String endDateTime,
+//            Model model) {
+//        try {
+////            String calendarId = "42a120091e519ed6d2e9d6372d5cfb188ee4d14d6362c7c8527192fc10b67994@group.calendar.google.com";
+//            String calendarId = "examharmony6@gmail.com";
+//            calendarManagementService.createEvent(calendarId, summary, description, location, startDateTime, endDateTime);
+//            model.addAttribute("message", "Event created successfully");
+//            return "eventSuccess";
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            model.addAttribute("alertMessage", "Error occurred while creating the event.");
+//            return "redirect:/admin/home";
+//        }
+//    }
+
     @GetMapping("/viewRequests")
     public String viewRequests(Model model) {
         List<ExamSlotRequest> examSlotRequests = examRequestRepository.findAll();
@@ -117,12 +157,7 @@ public class Admin {
                     iterator.remove();
                 }
             }
-
-
         }
-
-
-
         return "redirect:/admin/viewRequests";
     }
 
