@@ -5,7 +5,6 @@ import ca.cmpt276.examharmony.Model.CourseSectionInfo.CoursesSec;
 import ca.cmpt276.examharmony.Model.EditInterval.EditInterval;
 import ca.cmpt276.examharmony.Model.EditInterval.IntervalRepository;
 import ca.cmpt276.examharmony.Model.EditInterval.EditIntervalDTO;
-import ca.cmpt276.examharmony.Model.InvRequests.InvigilatorRequestRepository;
 import ca.cmpt276.examharmony.Model.InvRequests.InvigilatorRequestService;
 import ca.cmpt276.examharmony.Model.emailSender.EmailService;
 import ca.cmpt276.examharmony.Model.examRequest.ExamSlotRequest;
@@ -15,8 +14,8 @@ import ca.cmpt276.examharmony.Model.examSlot.examSlotRepository;
 import ca.cmpt276.examharmony.Model.user.User;
 import ca.cmpt276.examharmony.Model.user.UserRepository;
 import ca.cmpt276.examharmony.Model.examRequest.ExamSlotRequestService;
+import ca.cmpt276.examharmony.Model.user.UserService;
 
-import ca.cmpt276.examharmony.calendarUtils.CalendarManagementService;
 import ca.cmpt276.examharmony.utils.CustomUserDetails;
 import ca.cmpt276.examharmony.utils.DatabaseService;
 import ca.cmpt276.examharmony.utils.InstructorExamSlotRepository;
@@ -30,17 +29,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
 import java.util.Iterator;
 import java.util.List;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.util.Map;
 
 import ca.cmpt276.examharmony.Model.roles.RoleRepository;
 
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import ca.cmpt276.examharmony.Model.examRequest.ExamSlotRequestService;
 
 @Controller
 @RequestMapping("/admin")
@@ -51,9 +47,6 @@ public class Admin {
 
     @Autowired
     private UserRepository userRepository;
-
-    @Autowired
-    private RoleRepository roleRepository;
 
     @Autowired
     private ExamSlotRequestRepository examRequestRepository;
@@ -71,6 +64,9 @@ public class Admin {
     private InvigilatorRequestService invService;
 
     @Autowired
+    private UserService userService;
+
+    @Autowired
     private CourseRepository courseRepo;
 
     @Autowired
@@ -79,13 +75,71 @@ public class Admin {
     @Autowired
     private ExamSlotRequestService insService;
 
-    @Autowired
-    private CalendarManagementService calendarManagementService;
+//    private final InvigilatorRequestService invigilatorRequestService;
+//
+//    @Autowired
+//    public AdminRequestController(InvigilatorRequestService invigilatorRequestService) {
+//        this.invigilatorRequestService = invigilatorRequestService;
+//    }
 
-    @GetMapping("/createEvent")
-    public String creatEvent(Model model) {
-        return "form";
+    @GetMapping("/home")
+    public String adminTest(Model model){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if(authentication != null && authentication.getPrincipal() instanceof CustomUserDetails userDetails){
+            User admin = userRepository.findByUsername(userDetails.getUsername());
+            EditInterval interval = intervalRepository.findById(1);
+            model.addAttribute("interval", interval);
+            model.addAttribute("admin", admin);
+            return "admin/adminHome";
+        }
+        return "redirect:/login";
+
     }
+
+    @PostMapping("/sendRequest")
+    public String sendRequest(@RequestHeader(value = "Referer", required = false) String referer,
+                              @RequestParam String username,
+                              @RequestParam String email,
+                              @RequestParam String examCode,
+                              @RequestParam String examDate,
+                              RedirectAttributes redirectAttributes,
+                              Model model) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        User currentUser = userDetails.getCurrentUser();
+        EditInterval interval = intervalRepository.findById(1);
+        User user = userService.findByUsername(username);
+        if (user != null && user.getEmailAddress().equals(email)) {
+            LocalDateTime parsedExamDate = LocalDateTime.parse(examDate);
+            invService.createRequest(username, email, examCode, parsedExamDate);
+            redirectAttributes.addFlashAttribute("alertMessage", "Request sent successfully!");
+            if(referer == null){
+                model.addAttribute("admin", currentUser);
+                model.addAttribute("interval", interval);
+                return "admin/adminHome";
+            } else {
+                return "redirect:" + referer;
+            }
+        } else {
+            redirectAttributes.addFlashAttribute("alertMessage", "These credentials do not exist");
+            return "redirect:/admin/home";
+        }
+    }
+
+    @GetMapping("/adminTestPage")
+    public String adminTestPage() {
+        // Logic to fetch and display requests for admins
+        return "admin/adminHome";
+    }
+
+//    @Autowired
+//    private CalendarManagementService calendarManagementService;
+//
+//    @GetMapping("/createEvent")
+//    public String creatEvent(Model model) {
+//        return "form";
+//    }
 
 //   @GetMapping("/shareCal")
 //   public String shareCal(Model model) throws Exception {
@@ -118,15 +172,24 @@ public class Admin {
 //        }
 //    }
 
+    @GetMapping("/calendar")
+    public String getCalendar(Model model) {
+        return "admin/calendar";
+    }
+
     @GetMapping("/viewRequests")
     public String viewRequests(Model model) {
         List<ExamSlotRequest> examSlotRequests = examRequestRepository.findAll();
         model.addAttribute("examSlotRequests", examSlotRequests);
-        return "viewRequests";
+        return "admin/viewRequests";
     }
 
     @PostMapping("/approveRequest")
-    public String approveRequest(@RequestParam("requestId") int requestId) {
+    public String approveRequest(@RequestParam Map<String, String> examSlot) {
+
+        int requestId = Integer.parseInt(examSlot.get("requestId"));
+
+
         ExamSlotRequest request = examRequestRepository.findById(requestId).orElse(null);
         if (request != null) {
             request.setStatus("APPROVED");
@@ -136,9 +199,10 @@ public class Admin {
             examSlot exam = new examSlot();
             exam.setStartTime(request.getExamDate());
             exam.setDuration(request.getExamDuration());
-            exam.setNumOfRooms(-1);
-            exam.setNumInvigilator(-1);
-            exam.setAssignedRooms("EMPTY");
+
+            exam.setNumOfRooms(Integer.parseInt(examSlot.get("numberOfRooms")));
+            exam.setNumInvigilator(Integer.parseInt(examSlot.get("numberOfInvigilators")));
+            exam.setAssignedRooms(examSlot.get("assignedRooms"));
             exam.setStatus(request.getStatus());
         
             CoursesSec CourseID = courseRepo.findByCourseName(request.getCourseName());
@@ -172,7 +236,7 @@ public class Admin {
         }
     
         model.addAttribute("instructors", instructors);
-        return "viewInstructors";
+        return "admin/viewInstructors";
     }
     
 
@@ -182,7 +246,7 @@ public class Admin {
         List<User> invigilators = userRepository.findByRoleName("INVIGILATOR");
         model.addAttribute("invigilators",invigilators);
         model.addAttribute("invigilatorService", invService);
-        return "viewInvigilators";
+        return "admin/viewInvigilators";
     }
 
     @PostMapping("/add/interval")
@@ -196,7 +260,7 @@ public class Admin {
                 model.addAttribute("admin", admin);
                 model.addAttribute("interval", interval);
                 intervalRepository.save(interval);
-                return "adminHome";
+                return "admin/adminHome";
 
             } catch (RuntimeException err){
                 throw new InstructorController.BadRequest(err.getMessage());
@@ -206,9 +270,9 @@ public class Admin {
     }
 
     @PostMapping("/emailAll")
-    public String emailAll(Model model, RedirectAttributes redirectAttributes) throws MessagingException {
+    public String emailAll(RedirectAttributes redirectAttributes) throws MessagingException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails userDetails) {
+        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
 
             List<String> allEmails = userRepository.findAllEmailAddresses();
             String[] to = allEmails.toArray(new String[0]);

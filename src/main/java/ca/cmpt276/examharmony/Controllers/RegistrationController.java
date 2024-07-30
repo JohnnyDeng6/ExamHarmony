@@ -5,7 +5,6 @@ import ca.cmpt276.examharmony.Model.registration.UserRegistrationDto;
 import ca.cmpt276.examharmony.Model.user.UserService;
 import ca.cmpt276.examharmony.calendarUtils.CalendarManagementService;
 import ca.cmpt276.examharmony.utils.UserAlreadyExistException;
-import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -16,7 +15,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 
 // When an admin creates an account, assume they know the person’s email
@@ -40,7 +38,7 @@ import java.util.UUID;
         @GetMapping("/admin/register")
         public String showRegistrationForm(Model model) {
             model.addAttribute("user", new UserRegistrationDto());
-            return "registrationPage";
+            return "admin/registrationPage";
         }
 
         @PostMapping("/admin/registration")

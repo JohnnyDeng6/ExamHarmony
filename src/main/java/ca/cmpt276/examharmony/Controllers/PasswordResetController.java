@@ -13,14 +13,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
-import java.util.Base64;
 import java.util.UUID;
 
 @Controller
@@ -44,15 +40,15 @@ public class PasswordResetController {
 
         if (user == null || !user.isPasswordResetTokenValid()) {
             model.addAttribute("error", "This link does not exist");
-            return "reset-password-error";
+            return "general/reset-password-error";
         }
         model.addAttribute("passwordResetToken", passwordResetToken);
-        return "reset-password-form";
+        return "general/reset-password-form";
     }
 
     @PostMapping("/{prefix}/sendPrt")
     @ResponseBody
-    public String sendPasswordResetLink(RedirectAttributes redirectAttributes, @PathVariable("prefix") String prefix) {
+    public String sendPasswordResetLink(@PathVariable("prefix") String prefix) {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
@@ -91,7 +87,7 @@ public class PasswordResetController {
             }
         } else {
             model.addAttribute("error", "User not found.");
-            return "/forgot-password-form";
+            return "general/forgot-password-form";
         }
     }
 
@@ -116,16 +112,16 @@ public class PasswordResetController {
         User user = userService.findByPasswordResetToken(hashUtils.SHA256(passwordResetToken));
         if (user == null || !user.isPasswordResetTokenValid()) {
             model.addAttribute("error", "This link does not exist.");
-            return "reset-password-error";
+            return "general/reset-password-error";
         }
         model.addAttribute("passwordResetToken", passwordResetToken);
         if (!newPassword.equals(confirmPassword)) {
             model.addAttribute("error", "Passwords do not match.");
-            return "reset-password-form";
+            return "general/reset-password-form";
         }
         if (!newPassword.matches("^(?=.*[0-9])(?=.*[!@#$%^&*])[A-Za-z\\d@$!%*?&]{8,}$")) {
             model.addAttribute("error", "Password must be at least 8 characters long and include a number and a symbol.");
-            return "reset-password-form";
+            return "general/reset-password-form";
         }
         userService.updatePassword(user.getUUID(), newPassword);
         userService.invalidatePasswordResetToken(user.getUUID());

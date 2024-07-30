@@ -35,17 +35,17 @@ public class TestingController {
 
     @GetMapping("/adminExamSlot")
     public String showAdminExamSlotPage() {
-        return "adminExamSlot"; // This returns the template named "adminExamSlot.html"
+        return "admin/adminExamSlot"; // This returns the template named "adminExamSlot.html"
     }
 
     @GetMapping("/adminExamDisplay")
     public String showAdminExamDisplayPage(){
-        return "/adminExamDisplay";
+        return "admin/adminExamDisplay";
     }
 
     @GetMapping("/invTest")
     public String showInvigilator() {
-        return "invigilatorHome"; // This returns the template named "adminExamSlot.html"
+        return "invigilator/invigilatorHome"; // This returns the template named "adminExamSlot.html"
     }
 
     @GetMapping("/test/add_test_course")

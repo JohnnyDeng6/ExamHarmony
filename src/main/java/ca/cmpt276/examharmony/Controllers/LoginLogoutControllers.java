@@ -23,27 +23,14 @@ public class LoginLogoutControllers {
 
     @GetMapping("/login")
     public String login(){
-        return "loginPage";
+        return "general/loginPage";
     }
 
-    @GetMapping("/admin/home")
-    public String adminTest(Model model){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if(authentication != null && authentication.getPrincipal() instanceof CustomUserDetails userDetails){
-            User admin = userRepo.findByUsername(userDetails.getUsername());
-            EditInterval interval = intervalRepository.findById(1);
-            model.addAttribute("interval", interval);
-            model.addAttribute("admin", admin);
-            return "adminHome";
-        }
-        return "redirect:/login";
-
-    }
 
 
     @GetMapping("/test")    
     public String test(){
-        return "testPage";
+        return "general/testPage";
     }
 }
 

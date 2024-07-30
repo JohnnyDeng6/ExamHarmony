@@ -66,7 +66,7 @@ public class InstructorController {
         if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails userDetails) {
             User instructor = userRepo.findByUsername(userDetails.getUsername());
             model.addAttribute("instructor", instructor);
-            return "instructorHome";
+            return "instructor/instructorHome";
         } else {
             return "redirect:/login";
         }
@@ -84,7 +84,7 @@ public class InstructorController {
         model.addAttribute("examRequests", examSlotRequests);
         model.addAttribute("instructor", instructor);
         model.addAttribute("courseName", courseName);
-        return "viewExamSlotRequests";
+        return "instructor/viewExamSlotRequests";
     } else {
         return "redirect:/login";
     }
@@ -164,7 +164,7 @@ public class InstructorController {
         model.addAttribute("examRequests", instructor.findRequestsByCourse(courseName));
         model.addAttribute("instructor", instructor);
         model.addAttribute("courseName", courseName);
-        return "viewExamSlotRequests";
+        return "instructor/viewExamSlotRequests";
 
     }
 
@@ -196,7 +196,7 @@ public class InstructorController {
                     model.addAttribute("examRequests", instructor.findRequestsByCourse(courseName));
                     model.addAttribute("instructor", instructor);
                     model.addAttribute("courseName", courseName);
-                    return "viewExamSlotRequests";
+                    return "instructor/viewExamSlotRequests";
                 }
             }
             throw new NotFoundException("Requested exam slot request does not exist");
@@ -211,14 +211,14 @@ public class InstructorController {
         this.departments.clear();
         this.departments.addAll(departments);
         model.addAttribute("departmentInfo", this.departments);
-        return "department-selection";
+        return "instructor/department-selection";
     }
 
     @GetMapping("/instructor/view/departments/{semester}")
     public String viewDepartments(Model model, @PathVariable("semester") String semester){
         model.addAttribute("departmentInfo", this.departments);
         model.addAttribute("semester", semester);
-        return "department-selection";
+        return "instructor/department-selection";
     }
 
     @PostMapping("/instructor/view/add/course")
@@ -237,7 +237,7 @@ public class InstructorController {
             currentUser.addCourse(course);
             userRepo.save(currentUser);
             model.addAttribute("instructor", currentUser);
-            return "instructorHome";
+            return "instructor/instructorHome";
         } else {
             return "redirect:/login";
         }
