@@ -20,30 +20,16 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             max-width: 1200px;
             width: 100%;
-        }
-        .submit {
-            margin-top: 20px;
-        }
-        .display {
-            display: flex;
-            justify-content: center;
-            flex-direction: column;
-        }
-        .container {
             margin-bottom: 90px;
         }
-        .feedback{
-            color: #a82e2e;
-        }
-
-        .hidden { display: none; }
-
     </style>
 </head>
-<body class = "d-flex flex-column h-100">
+
+<!--<body class = "d-flex flex-column h-100">-->
+<body class="d-flex flex-column min-vh-100">
 <header th:insert="fragments/header :: header"></header>
 
-    <main class="main-container container-fluid">
+    <main class="container container-fluid py-5 flex-grow-1">
         <div class="table-container">
             <h1>Exam Slots</h1>
             <table id="examSlots" class="table table-striped">
@@ -80,18 +66,25 @@
                             </form>
                             <form th:action="@{/admin/examSlot/delete}" method="post" class="delete-form">
                                 <input type="hidden" name="id" th:value="${examSlot.id}">
-                                <button type="submit" class="btn btn-danger">Delete</button>
+                                <button type="submit" class="btn btn-danger px-3">Delete</button>
                             </form>
-                            
                         </td>
-                        
                     </tr>
                 </tbody>
             </table>
-            <a href="/admin/examSlot/add" class="btn btn-primary btn-sm">Add</a>
+            <a href="/admin/examSlot/add" class="btn btn-primary btn-sm px-4 py-2 mb-5">Add</a>
         </div>
-        <header th:insert="fragments/footer :: footer"></header>
+
+        <div id="calendarSection" class="hidden">
+            <h2>Calendar</h2>
+            <form action="/invigilator/home" method="get">
+                <div class="embed-responsive embed-responsive-16by9">
+                    <iframe src="https://calendar.google.com/calendar/embed?src=52ea1e5d777a891982013dc26653684dcf6c30520e5526be1cb60c0c34c01d10%40group.calendar.google.com&ctz=UTC" style="border: 0" width="800" height="600" frameborder="0" scrolling="no"></iframe>
+                </div>
+            </form>
+        </div>
     </main>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76A2z5WJrTiqLqd8s0D5yK2zYKEJ2v6JNe9JpY4eZUOm9IHQmM+9CZea2Fve82D" crossorigin="anonymous"></script>
+
+<header th:insert="fragments/footer :: footer"></header>
 </body>
 </html>

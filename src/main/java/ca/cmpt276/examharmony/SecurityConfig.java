@@ -61,7 +61,7 @@ public class SecurityConfig {
                         .requestMatchers("/instructor/**").hasRole("INSTRUCTOR")
                         .requestMatchers("/invigilator/**").hasRole("INVIGILATOR")
                         .requestMatchers("/forgot-password").permitAll()
-                                .requestMatchers("/forgot-password-form").permitAll()
+//                                .requestMatchers("/forgot-password-form").permitAll()
                                 .requestMatchers("/test/**").permitAll() //For testing
                         .anyRequest().authenticated()   //All other users must log in
                 )
