@@ -1,7 +1,9 @@
 
 package ca.cmpt276.examharmony.Controllers;
 import ca.cmpt276.examharmony.calendarUtils.CalendarManagementService;
+import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.client.util.DateTime;
+import org.hibernate.sql.ast.tree.expression.Star;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
@@ -127,48 +129,53 @@ public class examSlotController {
 
     @PostMapping("examSlot/update")
     public String updateExamSlot(@RequestParam Map<String, String> updatedExamSlot,HttpServletResponse response) throws Exception {
-        examSlot exam = examRepo.findById(Integer.parseInt(updatedExamSlot.get("id"))).orElseThrow(()-> new IllegalArgumentException("Invalid exam slot ID"));
-        
-        
-    
-        LocalDateTime StartTime = LocalDateTime.parse(updatedExamSlot.get("startTime"));
 
-        double duration = Double.parseDouble(updatedExamSlot.get("duration"));
-        exam.setDuration(duration);
+        try {
+            examSlot exam = examRepo.findById(Integer.parseInt(updatedExamSlot.get("id"))).orElseThrow(()-> new IllegalArgumentException("Invalid exam slot ID"));
+            LocalDateTime StartTime = LocalDateTime.parse(updatedExamSlot.get("startTime"));
+            exam.setStartTime(StartTime);
 
-        int numOfRooms = Integer.parseInt(updatedExamSlot.get("numOfRooms"));
-        exam.setNumOfRooms(numOfRooms);
+            double duration = Double.parseDouble(updatedExamSlot.get("duration"));
+            exam.setDuration(duration);
 
-        String assignedRooms = updatedExamSlot.get("assignedRooms");
-        exam.setAssignedRooms(assignedRooms);
+            int numOfRooms = Integer.parseInt(updatedExamSlot.get("numOfRooms"));
+            exam.setNumOfRooms(numOfRooms);
 
-        int numInvigilator = Integer.parseInt(updatedExamSlot.get("numInvigilator"));
-        exam.setNumInvigilator(numInvigilator);
+            String assignedRooms = updatedExamSlot.get("assignedRooms");
+            exam.setAssignedRooms(assignedRooms);
 
-
-        String courseName = updatedExamSlot.get("courseName");
-
-        CoursesSec CourseID = courseRepo.findByCourseName(courseName);
-        exam.setCourseID(CourseID);
-
-        String status = updatedExamSlot.get("status");
-        exam.setStatus(status);
-
-        String calendarId = "52ea1e5d777a891982013dc26653684dcf6c30520e5526be1cb60c0c34c01d10@group.calendar.google.com";
-        String description = "Room number: " + numOfRooms + "\nRooms: " + assignedRooms + "\nNumber of Invigilators: " + numInvigilator + "\nStatus: " + status;
-
-        ZoneId zoneId = ZoneId.of("America/Vancouver");
-        ZonedDateTime zonedStartDateTime = StartTime.atZone(zoneId);
-        ZonedDateTime zonedEndDateTime = (StartTime.plusMinutes((long) (duration*60))).atZone(zoneId);
-
-        DateTime startDateTime = new DateTime(zonedStartDateTime.toInstant().toEpochMilli());
-        DateTime endDateTime = new DateTime(zonedEndDateTime.toInstant().toEpochMilli());
-
-        calendarManagementService.createEvent(calendarId, courseName, description, assignedRooms, startDateTime, endDateTime);
+            int numInvigilator = Integer.parseInt(updatedExamSlot.get("numInvigilator"));
+            exam.setNumInvigilator(numInvigilator);
 
 
-        examRepo.save(exam);
-        
+            String courseName = updatedExamSlot.get("courseName");
+
+            CoursesSec CourseID = courseRepo.findByCourseName(courseName);
+            exam.setCourseID(CourseID);
+
+            String status = updatedExamSlot.get("status");
+            exam.setStatus(status);
+
+            String calendarId = "52ea1e5d777a891982013dc26653684dcf6c30520e5526be1cb60c0c34c01d10@group.calendar.google.com";
+            String description = "Room number: " + numOfRooms + "\nRooms: " + assignedRooms + "\nNumber of Invigilators: " + numInvigilator + "\nStatus: " + status;
+
+            ZoneId zoneId = ZoneId.of("America/Vancouver");
+            ZonedDateTime zonedStartDateTime = StartTime.atZone(zoneId);
+            ZonedDateTime zonedEndDateTime = (StartTime.plusMinutes((long) (duration*60))).atZone(zoneId);
+
+            DateTime startDateTime = new DateTime(zonedStartDateTime.toInstant().toEpochMilli());
+            DateTime endDateTime = new DateTime(zonedEndDateTime.toInstant().toEpochMilli());
+
+            calendarManagementService.createEvent(calendarId, courseName, description, assignedRooms, startDateTime, endDateTime);
+
+
+            examRepo.save(exam);
+
+        }catch (GoogleJsonResponseException e) {
+            System.err.println("API Error: " + e.getDetails());
+            return "redirect:/admin/home";
+        }
+
         return "redirect:/admin/examSlots";
     }
 
