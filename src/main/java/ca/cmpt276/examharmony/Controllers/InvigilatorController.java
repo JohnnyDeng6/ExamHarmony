@@ -37,7 +37,7 @@ public class InvigilatorController {
         model.addAttribute("interval", interval);
         model.addAttribute("invigilatorName", username);
         model.addAttribute("requests", requests);
-        return "invigilatorHome";
+        return "invigilator/invigilatorHome";
     }
 
 
