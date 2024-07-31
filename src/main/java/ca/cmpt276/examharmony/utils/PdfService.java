@@ -38,7 +38,7 @@ public class PdfService {
 
         for (examSlot slot : examSlots) {
             table.addCell(new Cell().add(new Paragraph(String.valueOf(slot.getId()))));
-            table.addCell(new Cell().add(new Paragraph(String.valueOf(slot.getCourseID().getId()))));
+            table.addCell(new Cell().add(new Paragraph(slot.getCourseID().getCourseName())));
             table.addCell(new Cell().add(new Paragraph(slot.getStartTime().toString())));
             table.addCell(new Cell().add(new Paragraph(String.valueOf(slot.getDuration()))));
             table.addCell(new Cell().add(new Paragraph(String.valueOf(slot.getNumOfRooms()))));
