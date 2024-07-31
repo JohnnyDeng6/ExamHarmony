@@ -121,7 +121,7 @@
 <!--                </tr>-->
                 <tr>
                     <td>Enter exam duration (hours):</td>
-                    <td><input type="text" class="form-control duration" name="duration"></td>
+                    <td><input type="text" class="form-control duration" name="duration" required></td>
                 </tr>
                 <tr>
                     <td>Enter preference 1:</td>
@@ -250,6 +250,9 @@
         console.log(preferences);
 
         try {
+            if(typeof examDuration !== 'number'){
+                throw new Error("Exam duration must be a number");
+            }
             const response = await fetch(`/instructor/examslots/edit/${courseName.replace(/['"]+/g, '')}`, {
                 method: "POST",
                 headers: {
