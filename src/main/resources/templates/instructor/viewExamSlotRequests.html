@@ -125,18 +125,20 @@
                 </tr>
                 <tr>
                     <td>Enter preference 1:</td>
-                    <td><input type="text" class="form-control p1" name="p1"></td>
+                    <td><label for="examDate1">Exam Date (yyyy-MM-ddTHH:mm):</label>
+                        <input type="datetime-local" id="examDate1" name="p1" ></td>
                 </tr>
                 <tr>
                     <td>Enter preference 2:</td>
-                    <td><input type="text" class="form-control p2" name="p2"></td>
+                    <td><label for="examDate2">Exam Date (yyyy-MM-ddTHH:mm):</label>
+                        <input type="datetime-local" id="examDate2" name="p2" ></td>
                 </tr>
                 <tr>
                     <td>Enter preference 3:</td>
-                    <td><input type="text" class="form-control p3" name="p3"></td>
+                    <td><label for="examDate3">Exam Date (yyyy-MM-ddTHH:mm):</label>
+                        <input type="datetime-local" id="examDate3" name="p3"></td>
                 </tr>
             </table>
-            <div class="lead fw-normal mb-0"> Enter dates in the form "yyyy-MM-dd HH:mm". Ex: 2024-04-15 14:30 </div>
             <div class="submit">
                 <button type="submit" class="btn btn-dark">Submit Requests</button>
             </div>
@@ -228,9 +230,9 @@
         let instructorName = '[[${instructor.getUsername()}]]';
         // const examCode = document.querySelector('.code').value;
         const examDuration = document.querySelector('.duration').value;
-        const preference1 = document.querySelector('.p1').value;
-        const preference2 = document.querySelector('.p2').value;
-        const preference3 = document.querySelector('.p3').value;
+        const preference1 = document.querySelector('#examDate1').value;
+        const preference2 = document.querySelector('#examDate2').value;
+        const preference3 = document.querySelector('#examDate3').value;
         const courseName = '[[${courseName}]]';
         const preferences = [];
         if (preference1) {
@@ -245,7 +247,8 @@
             preferences.push({preferenceStatus: 3, /*examCode: examCode,*/ examDuration: examDuration, examDate: preference3, courseName: courseName,
                 instructorName: instructorName.replace(/["']/g, '')});
         }
-        console.log(instructorName.replace(/["']/g, ''));
+        console.log(preferences);
+
         try {
             const response = await fetch(`/instructor/examslots/edit/${courseName.replace(/['"]+/g, '')}`, {
                 method: "POST",

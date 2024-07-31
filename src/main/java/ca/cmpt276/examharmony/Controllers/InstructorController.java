@@ -96,7 +96,6 @@ public class InstructorController {
         if (examSlotRequestDTOList.isEmpty()) {
             return "redirect:/instructor/examslots/" + courseName;
         }
-        System.out.println("Requests sent");
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !(authentication.getPrincipal() instanceof CustomUserDetails userDetails)) {
             return "redirect:/login";
