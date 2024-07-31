@@ -19,9 +19,12 @@ import ca.cmpt276.examharmony.Model.user.UserService;
 import ca.cmpt276.examharmony.utils.CustomUserDetails;
 import ca.cmpt276.examharmony.utils.DatabaseService;
 import ca.cmpt276.examharmony.utils.InstructorExamSlotRepository;
+import ca.cmpt276.examharmony.utils.PdfService;
 import jakarta.mail.MessagingException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -81,6 +84,18 @@ public class AdminController {
 //    public AdminRequestController(InvigilatorRequestService invigilatorRequestService) {
 //        this.invigilatorRequestService = invigilatorRequestService;
 //    }
+    @Autowired
+    private PdfService pdfService;
+
+    @GetMapping("/generatePdf")
+    public ResponseEntity<byte[]> generatePdf() {
+        byte[] pdfBytes = pdfService.generatePdf();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=exam_slots.pdf");
+
+        return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
+    }
 
     @GetMapping("/home")
     public String adminTest(Model model){
