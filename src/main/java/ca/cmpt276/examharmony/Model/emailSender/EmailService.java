@@ -34,7 +34,7 @@ public class EmailService {
         MimeMessage message = emailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
-        message.setFrom("noreply.examharmony@gmail.com");
+//        message.setFrom("noreply.examharmony@gmail.com");
         helper.setTo("noreply.examharmony@gmail.com");
         helper.setBcc(to);
         helper.setSubject(subject);

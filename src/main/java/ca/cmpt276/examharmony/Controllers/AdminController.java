@@ -19,6 +19,7 @@ import ca.cmpt276.examharmony.Model.user.UserService;
 import ca.cmpt276.examharmony.utils.CustomUserDetails;
 import ca.cmpt276.examharmony.utils.DatabaseService;
 import ca.cmpt276.examharmony.utils.InstructorExamSlotRepository;
+//import ca.cmpt276.examharmony.utils.PdfService;
 import ca.cmpt276.examharmony.utils.PdfService;
 import jakarta.mail.MessagingException;
 
@@ -32,6 +33,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Iterator;
 import java.util.List;
@@ -88,7 +90,7 @@ public class AdminController {
     private PdfService pdfService;
 
     @GetMapping("/generatePdf")
-    public ResponseEntity<byte[]> generatePdf() {
+    public ResponseEntity<byte[]> generatePdf() throws IOException {
         byte[] pdfBytes = pdfService.generatePdf();
 
         HttpHeaders headers = new HttpHeaders();
