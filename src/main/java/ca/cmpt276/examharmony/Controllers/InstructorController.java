@@ -94,9 +94,8 @@ public class InstructorController {
     @PostMapping("/instructor/examslots/edit/{courseName}")
     public String submitData(@RequestBody List<ExamSlotRequestDTO> examSlotRequestDTOList, Model model, @PathVariable("courseName") String courseName) {
         if (examSlotRequestDTOList.isEmpty()) {
-            return "redirect:/instructor/examslots/" + courseName;
+            throw new BadRequest("At least 1 exam date must be entered");
         }
-        System.out.println("Requests sent");
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !(authentication.getPrincipal() instanceof CustomUserDetails userDetails)) {
             return "redirect:/login";
@@ -208,10 +207,14 @@ public class InstructorController {
 
     @PostMapping("/instructor/get/departments")
     public String getDepartments(Model model, @RequestBody List<DepartmentDTO> departments) {
-        this.departments.clear();
-        this.departments.addAll(departments);
-        model.addAttribute("departmentInfo", this.departments);
-        return "instructor/department-selection";
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if(authentication != null && authentication.getPrincipal() instanceof CustomUserDetails userDetails){
+            this.departments.clear();
+            this.departments.addAll(departments);
+            model.addAttribute("departmentInfo", this.departments);
+            return "instructor/department-selection";
+        }
+        return "redirect:/login";
     }
 
     @GetMapping("/instructor/view/departments/{semester}")
@@ -227,12 +230,27 @@ public class InstructorController {
         if(authentication != null && authentication.getPrincipal() instanceof CustomUserDetails userDetails){
             User currentUser = userRepo.findByUsername(userDetails.getUsername());
             CoursesSec course = CoursesSec.CreateNewCourse(newCourse.department, newCourse.courseName);
+
+            System.out.println(currentUser);
+
             Set<CoursesSec> instructorCourses = currentUser.getInstructorCourses();
             for(CoursesSec currentCourse: instructorCourses){
                 if(currentCourse.getCourseName().equals(course.getCourseName())){
-                    throw new BadRequest("You already have this Course");
+                    throw new BadRequest("You are already teaching this Course");
                 }
             }
+
+//            List<User> instructors = userRepo.findByRoleName("INSTRUCTOR");
+//
+//            for(User user : instructors){
+//                Set<CoursesSec> courses = user.getInstructorCourses();
+//                for(CoursesSec courseSec : courses){
+//                    if(courseSec.getCourseName().equals(course.getCourseName())){
+//                        throw new BadRequest("Another instructor is teaching this course");
+//                    }
+//                }
+//            }
+
             courseRepo.save(course);
             currentUser.addCourse(course);
             userRepo.save(currentUser);

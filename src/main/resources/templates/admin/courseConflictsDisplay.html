@@ -50,9 +50,6 @@
                         <td>
                             <form th:action="@{/admin/courseConflict/select}" method="get" class="edit-form">
                                 <input type="hidden" name="id" th:value="${courseConflict.id}" />
-                                <button type="submit" class="btn btn-primary">
-                                    Update
-                                </button>
                             </form>
                             <form th:action="@{/admin/courseConflict/delete}" method="post" class="delete-form">
                                 <input type="hidden" name="id" th:value="${courseConflict.id}">

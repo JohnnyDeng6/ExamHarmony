@@ -78,78 +78,43 @@
                                 <tr>
                                     <th>Instructor Username</th>
                                     <th>Info</th>
-                                    <th> Requests </th>
+                                    <th>Requests</th>
                                 </tr>
                                 </thead>
                                 <tbody>
                                 <!-- Dynamic rows populated from server-side -->
                                 <tr class="instructor" th:each="instructor : ${instructors}">
-                                    <td  th:text="${instructor.username}">instructor Name</td>
+                                    <td th:text="${instructor.username}">Instructor Name</td>
 
                                     <td class="instructor-info">
-
                                         <ul>
-
-                                            <li th:text="'Email: ' + ${instructor.getEmailAddress()}">  </li>
-                                            <li th:text="'Name: ' + ${instructor.getName()}">  </li>
-
+                                            <li th:text="'Email: ' + ${instructor.getEmailAddress()}"></li>
+                                            <li th:text="'Name: ' + ${instructor.getName()}"></li>
                                         </ul>
-
-                                        <!-- <button class="btn btn-info dropdown-toggle btn-sm send-request" >Send Request to instructor</button>
-
-                                        <div class="request-form-container">
-                                            <form class="request-form" action="/admin/sendRequest" method="post">
-                                                <div class="input-container">
-                                                    <input type="hidden" id="username" name="username" th:value="${instructor.getUsername()}">
-                                                </div>
-                                                <div class="input-container">
-                                                    <input type="hidden" id="email" name="email" th:value="${instructor.getEmailAddress()}">
-                                                </div>
-                                                <div class="input-container">
-                                                    <label for="examCode">Exam Code :</label>
-                                                    <input type="text" id="examCode" name="examCode" required>
-                                                </div>
-                                                <div class="input-container">
-                                                    <label for="examDate">Exam Date (yyyy-MM-ddTHH:mm):</label>
-                                                    <input type="datetime-local" id="examDate" name="examDate" required>
-                                                </div>
-                                                <div class="input-container">
-                                                    <button type="submit" class="btn btn-success btn-sm">Send Request</button>
-                                                </div>
-                                            </form>
-                                        </div> -->
-
                                     </td>
 
-                                    <!-- <td class="instructor-requests">
-                                        <div th:each="instructor : ${instructors}">
-                                            <h2 th:text="${instructor.name}">Instructor Name</h2>
-                                    
-                                            <div th:if="${not #lists.isEmpty(instructor.examSlotRequests)}">
-                                                <button class="btn btn-info dropdown-toggle btn-sm see-requests"> See Requests </button>
-                                    
-                                                <div class="request-container">
-                                                    <ul>
-                                                        <li th:each="request : ${instructor.examSlotRequests}">
-                                                            <div>
-                                                                <p><strong th:text="'Exam: ' + ${request.getExamCode}"> </strong></p>
-                                                                <p th:text="'Exam Date: ' + ${request.getExamDate}"> </p>
-                                                                <p th:text="'Status: ' + ${request.getExamSlotStatus}"> </p>
-                                                            </div>
-                                                        </li>
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                    
-                                            <div th:if="${#lists.isEmpty(instructor.examSlotRequests)}">
-                                                <p>No requests have been made yet</p>
+                                    <td class="instructor-requests">
+                                        <div th:if="${not #lists.isEmpty(instructor.examSlotRequests)}">
+                                            <button class="btn btn-info dropdown-toggle btn-sm see-requests">See Requests</button>
+
+                                            <div class="request-container" style="display: none;">
+                                                <ul>
+                                                    <li th:each="request : ${instructor.examSlotRequests}">
+                                                        <div>
+                                                            <p><strong th:text="'Exam: ' + ${request.courseName}"></strong></p>
+                                                            <p th:text="${#temporals.format(request.examDate, 'yyyy-MM-dd HH:mm')}"></p>
+                                                            <p th:text="'Status: ' + ${request.status}"></p>
+                                                        </div>
+                                                    </li>
+                                                </ul>
                                             </div>
                                         </div>
-                                    </td> -->
-                                    
 
+                                        <div th:if="${#lists.isEmpty(instructor.examSlotRequests)}">
+                                            <p>No requests have been made yet</p>
+                                        </div>
+                                    </td>
                                 </tr>
-
                                 </tbody>
                             </table>
                         </div>
@@ -161,50 +126,23 @@
         </div>
     </section>
 
-    <header th:insert="fragments/footer :: footer"></header>
+    <footer th:insert="fragments/footer :: footer"></footer>
 </main>
 
-</body>
-
 <script>
-
-    function toggleRequestForm() {
-        let form = document.querySelector('.request-form');
-        form.style.display = form.style.display === 'block' ? 'none' : 'block';
-    }
-
-    document.addEventListener("DOMContentLoaded", ()=>{
-        let rows = document.getElementsByClassName('instructor');
-        for(let i = 0; i < rows.length; i++){
-            console.log(rows[i]);
-
-            let row = rows[i];
-            row.querySelector('.send-request').addEventListener('click', ()=>{
-                let container = rows[i].querySelector('.instructor-info');
-                let form = container.querySelector('.request-form');
-                form.style.display = form.style.display === 'block' ? 'none' : 'block';
-            })
-
-            // rows[i].querySelector('.see-requests').addEventListener('click',()=>{
-            //     let requestContainer = rows[i].querySelector('.instructor-requests');
-            //     let list = requestContainer.querySelector('.request-container');
-            //     list.style.display = list.style.display === 'block' ? 'none' : 'block';
-            // });
-        }
-        for(let i = 0; i < rows.length; i++) {
-            console.log(rows[i]);
-            let button =  rows[i].querySelector('.see-requests');
-            if(button !== null){
-                button.addEventListener('click',()=>{
-                    console.log("Hello");
-                    let requestContainer = rows[i].querySelector('.instructor-requests');
-                    let list = requestContainer.querySelector('.request-container');
-                    list.style.display = list.style.display === 'block' ? 'none' : 'block';
-                });
-            }
-
-        }
+    document.addEventListener("DOMContentLoaded", function() {
+        document.querySelectorAll(".see-requests").forEach(button => {
+            button.addEventListener("click", function() {
+                console.log('Button clicked');
+                const requestContainer = this.nextElementSibling;
+                if (requestContainer.style.display === "none" || requestContainer.style.display === "") {
+                    requestContainer.style.display = "block";
+                } else {
+                    requestContainer.style.display = "none";
+                }
+            });
+        });
     });
-
 </script>
+</body>
 </html>

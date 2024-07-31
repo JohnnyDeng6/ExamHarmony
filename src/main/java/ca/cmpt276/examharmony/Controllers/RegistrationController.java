@@ -1,6 +1,6 @@
 package ca.cmpt276.examharmony.Controllers;
 
-import ca.cmpt276.examharmony.Model.emailSender.EmailService;
+import ca.cmpt276.examharmony.utils.EmailService;
 import ca.cmpt276.examharmony.Model.registration.UserRegistrationDto;
 import ca.cmpt276.examharmony.Model.user.UserService;
 import ca.cmpt276.examharmony.calendarUtils.CalendarManagementService;
@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 
     @Controller
@@ -36,9 +37,9 @@ import java.util.UUID;
         }
 
         @PostMapping("/admin/registration")
-        public String registerUserAccount(@ModelAttribute("user") UserRegistrationDto registrationDto, RedirectAttributes redirectAttributes, HttpSession session, Errors errors) {
+        public String registerUserAccount(@ModelAttribute("user") UserRegistrationDto registrationDto, RedirectAttributes redirectAttributes, HttpSession session, Errors errors) throws NoSuchAlgorithmException {
+            UUID prtUUID = userService.registerNewUser(registrationDto);
             try {
-                UUID prtUUID = userService.registerNewUser(registrationDto);
                 redirectAttributes.addFlashAttribute("alertMessage", "New user registered successfully, a link has been sent to the email. Return home");
                 String toEmail = registrationDto.getEmail();
                 String subject = "Registration Confirmation";
@@ -55,7 +56,11 @@ import java.util.UUID;
                 redirectAttributes.addFlashAttribute("alertMessage", "Account already exists, please choose another email or username");
                 return "redirect:/admin/register";
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                String link = "https://examharmony.onrender.com/reset-password?passwordResetToken=" + prtUUID;
+                redirectAttributes.addFlashAttribute("alertMessage", "email failed to send, this an link to set the password for the account, do not lose it: " + link);
+                return "redirect:/admin/home";
+//                throw new RuntimeException(e);
+
             }
             return "redirect:/admin/home";
         }

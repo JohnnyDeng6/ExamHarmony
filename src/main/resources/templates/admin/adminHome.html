@@ -12,6 +12,11 @@
     <script src="/scripts.js" defer></script>
     <style>
 
+        html, body, .main {
+            height: 100%;
+            margin: 0;
+        }
+
         h1 {
             text-align: center;
             font-weight: bold;
@@ -70,7 +75,7 @@
 </head>
 <body>
 
-<main class="flex-shrink-0">
+<main class="flex-shrink-0 main">
 
     <header th:insert="fragments/header :: header"></header>
 
@@ -146,9 +151,10 @@
         </div>
     </section>
 
-    <header th:insert="fragments/footer :: footer"></header>
 
 </main>
+
+<header th:insert="fragments/footer :: footer"></header>
 
     <script>
 
@@ -233,7 +239,8 @@
                                 //worked fine
                             }
                         } catch (err) {
-
+                            feedbackContainer.style.color = "red";
+                            feedbackContainer.innerText = "Interval Successfully set, However mass email failed to send";
                         }
 
                     }

@@ -7,7 +7,7 @@ import ca.cmpt276.examharmony.Model.EditInterval.IntervalRepository;
 import ca.cmpt276.examharmony.Model.EditInterval.EditIntervalDTO;
 import ca.cmpt276.examharmony.Model.InvRequests.InvigilatorRequestService;
 import ca.cmpt276.examharmony.Model.courseConflict.courseConflictRepository;
-import ca.cmpt276.examharmony.Model.emailSender.EmailService;
+import ca.cmpt276.examharmony.utils.EmailService;
 import ca.cmpt276.examharmony.Model.examRequest.ExamSlotRequest;
 import ca.cmpt276.examharmony.Model.examRequest.ExamSlotRequestRepository;
 import ca.cmpt276.examharmony.Model.examSlot.examSlot;
@@ -20,9 +20,12 @@ import ca.cmpt276.examharmony.Model.user.UserService;
 import ca.cmpt276.examharmony.utils.CustomUserDetails;
 import ca.cmpt276.examharmony.utils.DatabaseService;
 import ca.cmpt276.examharmony.utils.InstructorExamSlotRepository;
+import ca.cmpt276.examharmony.utils.PdfService;
 import jakarta.mail.MessagingException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -31,12 +34,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import ca.cmpt276.examharmony.Model.roles.RoleRepository;
 
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -86,6 +88,18 @@ public class AdminController {
 //    public AdminRequestController(InvigilatorRequestService invigilatorRequestService) {
 //        this.invigilatorRequestService = invigilatorRequestService;
 //    }
+    @Autowired
+    private PdfService pdfService;
+
+    @GetMapping("/generatePdf")
+    public ResponseEntity<byte[]> generatePdf() throws IOException {
+        byte[] pdfBytes = pdfService.generatePdf();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=exam_slots.pdf");
+
+        return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
+    }
 
     @GetMapping("/home")
     public String adminTest(Model model){
@@ -247,17 +261,18 @@ public class AdminController {
 
     @GetMapping("/viewInstructors")
     public String viewInstructors(Model model) {
-        List<User> instructors = userRepository.findByRoleName("INSTRUCTOR");
-    
-        // Fetch and set exam slot requests for each instructor
-        for (User instructor : instructors) {
-            List<ExamSlotRequest> requests = insService.getRequests(instructor.getUsername());
-            instructor.setExamSlotRequests(requests); // Using your provided setter method
-        }
-    
-        model.addAttribute("instructors", instructors);
-        return "admin/viewInstructors";
+    List<User> instructors = userRepository.findByRoleName("INSTRUCTOR");
+
+    // Fetch and set exam slot requests for each instructor
+    for (User instructor : instructors) {
+        List<ExamSlotRequest> examSlotRequests = examRequestRepository.findByInstructorName(instructor.getUsername());
+        instructor.setExamSlotRequests(examSlotRequests); // Assuming a setter method exists in User class
+       // model.addAttribute("instructors", instructors);
     }
+
+    model.addAttribute("instructors", instructors);
+    return "admin/viewInstructors";
+}
     
 
 
@@ -275,6 +290,7 @@ public class AdminController {
         if(authentication != null && authentication.getPrincipal() instanceof CustomUserDetails userDetails){
             EditInterval interval = intervalRepository.findById(1);
             try{
+
                 interval.setTimes(intervalDTO.startDate, intervalDTO.endDate);
                 User admin = userRepository.findByUsername(userDetails.getUsername());
                 model.addAttribute("admin", admin);
