@@ -7,6 +7,6 @@ import ca.cmpt276.examharmony.Model.CourseSectionInfo.CoursesSec;
 import java.util.List;
 
 public interface examSlotRepository extends JpaRepository<examSlot, Integer> {
-    // boolean existsByCourseID(CoursesSec courseID);
+    
     
 }

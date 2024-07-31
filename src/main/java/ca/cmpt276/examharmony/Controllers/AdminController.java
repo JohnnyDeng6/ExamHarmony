@@ -152,7 +152,19 @@ public class AdminController {
     }
 
     public boolean overlap(LocalDateTime start1, LocalDateTime end1, LocalDateTime start2, LocalDateTime end2) {
-        return start1.isBefore(end2) && start2.isBefore(end1);
+        
+        LocalDate date1Start = start1.toLocalDate();
+        LocalDate date1End = end1.toLocalDate();
+        LocalDate date2Start = start2.toLocalDate();
+        LocalDate date2End = end2.toLocalDate();
+    
+        
+        boolean sameDay = date1Start.equals(date2Start) || date1Start.equals(date2End)
+                          || date1End.equals(date2Start) || date1End.equals(date2End)
+                          || (date2Start.isBefore(date1End) && date1Start.isBefore(date2End));
+    
+        
+        return sameDay;
     }
 
     public static LocalDateTime calculateEndTime(LocalDateTime startTime, double durationInHours) {
@@ -183,8 +195,9 @@ public class AdminController {
             exam.setAssignedRooms(examSlot.get("assignedRooms"));
             exam.setStatus(request.getStatus());
         
-            CoursesSec CourseID = courseRepo.findByCourseName(request.getCourseName());
-            exam.setCourseID(CourseID);
+
+            List<CoursesSec> CourseID = courseRepo.findAllByCourseName(request.getCourseName());
+            exam.setCourseID(CourseID.get(0));
         
             examRepo.save(exam);
 

@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.ui.Model;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -63,8 +64,21 @@ public class examSlotController {
 
 
     public boolean overlap(LocalDateTime start1, LocalDateTime end1, LocalDateTime start2, LocalDateTime end2) {
-        return start1.isBefore(end2) && start2.isBefore(end1);
+        
+        LocalDate date1Start = start1.toLocalDate();
+        LocalDate date1End = end1.toLocalDate();
+        LocalDate date2Start = start2.toLocalDate();
+        LocalDate date2End = end2.toLocalDate();
+    
+        
+        boolean sameDay = date1Start.equals(date2Start) || date1Start.equals(date2End)
+                          || date1End.equals(date2Start) || date1End.equals(date2End)
+                          || (date2Start.isBefore(date1End) && date1Start.isBefore(date2End));
+    
+        
+        return sameDay;
     }
+
 
     public static LocalDateTime calculateEndTime(LocalDateTime startTime, double durationInHours) {
         long hours = (long) durationInHours;
@@ -121,8 +135,8 @@ public class examSlotController {
         exam.setAssignedRooms(assignedRooms);
         exam.setStatus(status);
         
-        CoursesSec CourseID = courseRepo.findByCourseName(courseName);
-        exam.setCourseID(CourseID);
+        List<CoursesSec> CourseID = courseRepo.findAllByCourseName(courseName);
+        exam.setCourseID(CourseID.get(0));
         
         examRepo.save(exam);
 
@@ -191,8 +205,10 @@ public class examSlotController {
 
             String courseName = updatedExamSlot.get("courseName");
 
-            CoursesSec CourseID = courseRepo.findByCourseName(courseName);
-            exam.setCourseID(CourseID);
+
+            List<CoursesSec> CourseID = courseRepo.findAllByCourseName(courseName);
+            exam.setCourseID(CourseID.get(0));
+
 
             String status = updatedExamSlot.get("status");
             exam.setStatus(status);
@@ -210,7 +226,7 @@ public class examSlotController {
             calendarManagementService.createEvent(calendarId, courseName, description, assignedRooms, startDateTime, endDateTime);
 
 
-            examRepo.save(exam);
+            
 
             List<examSlot> examSlots = examRepo.findAll();
 
@@ -229,11 +245,11 @@ public class examSlotController {
                     if(conflictExists){
                     
                         redirectAttributes.addFlashAttribute("errorMessage", "Exam slot added successfully, but a scheduling conflict was detected with the following course(s): "+course1 +" "+course2 +". Please review the schedule.");
-                        break;
                     }
                 }
     
             }
+            examRepo.save(exam);
 
         }catch (GoogleJsonResponseException e) {
             System.err.println("API Error: " + e.getDetails());

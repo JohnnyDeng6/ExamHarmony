@@ -17,5 +17,6 @@ public class DatabaseService {
         jdbcTemplate.execute("TRUNCATE TABLE instructor_courses CASCADE");
         jdbcTemplate.execute("TRUNCATE TABLE instructor_exam_requests CASCADE");
         jdbcTemplate.execute("TRUNCATE TABLE invigilator_request CASCADE");
+        jdbcTemplate.execute("TRUNCATE TABLE course_conflict CASCADE");
     }
 }
