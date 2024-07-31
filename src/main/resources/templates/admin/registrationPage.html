@@ -27,10 +27,9 @@
 </head>
 <body>
 
-<header th:insert="fragments/header :: header"></header>
-
 <main class="flex-shrink-0">
 
+    <header th:insert="fragments/header :: header"></header>
 
     <!-- Page Content-->
     <section class="py-5 bg-light main-container">
@@ -79,19 +78,12 @@
 
     </section>
 
+    <header th:insert="fragments/footer :: footer"></header>
 
 </main>
 
-<header th:insert="fragments/footer :: footer"></header>
-
 </body>
 <style>
-
-    html, body, main {
-        height: 100%;
-        margin: 0;
-    }
-
     h2 {
         text-align: center;
     }

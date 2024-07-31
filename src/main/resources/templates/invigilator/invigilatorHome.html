@@ -12,11 +12,6 @@
     <script src="/scripts.js" defer></script>
     <style>
 
-        html, body, .main {
-            height: 100%;
-            margin: 0;
-        }
-
         .container {
             text-align: center;
             background: white;
@@ -48,7 +43,7 @@
     </style>
 </head>
 <body>
-<main class="flex-shrink-0 main">
+<main class="flex-shrink-0">
 
     <header th:insert="fragments/header :: header"></header>
 
@@ -142,6 +137,40 @@
         </div>
     </section>
 
+    <section class="py-5 bg-light" style="margin-bottom: 80px">
+        <div class="container px-5">
+            <div class="row gx-5">
+                <div class="col-xl-8">
+                    <h2 class="fw-bolder fs-5 mb-4"> Notifications </h2>
+
+                    <!-- Add calendar view here-->
+
+                    <!-- Replace all of this -->
+                    <div class="mb-4">
+                        <div class="small text-muted">May 12, 2023</div>
+                        <a class="link-dark" href="#!"><h3>Start Bootstrap releases Bootstrap 5 updates for templates and themes</h3></a>
+                    </div>
+                    <!-- News item-->
+                    <div class="mb-5">
+                        <div class="small text-muted">May 5, 2023</div>
+                        <a class="link-dark" href="#!"><h3>Bootstrap 5 has officially landed</h3></a>
+                    </div>
+                    <!-- News item-->
+                    <div class="mb-5">
+                        <div class="small text-muted">Apr 21, 2023</div>
+                        <a class="link-dark" href="#!"><h3>This is another news article headline, but this one is a little bit longer</h3></a>
+                    </div>
+                    <div class="text-end mb-5 mb-xl-0">
+                        <a class="text-decoration-none" href="#!">
+                            More news
+                            <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
 </main>
 
 <header th:insert="fragments/footer :: footer"></header>
