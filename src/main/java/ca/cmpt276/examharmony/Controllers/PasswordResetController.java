@@ -1,7 +1,7 @@
 package ca.cmpt276.examharmony.Controllers;
 
 import ca.cmpt276.examharmony.utils.CustomUserDetails;
-import ca.cmpt276.examharmony.Model.emailSender.EmailService;
+import ca.cmpt276.examharmony.utils.EmailService;
 import ca.cmpt276.examharmony.Model.user.User;
 import ca.cmpt276.examharmony.Model.user.UserRepository;
 import ca.cmpt276.examharmony.Model.user.UserService;
