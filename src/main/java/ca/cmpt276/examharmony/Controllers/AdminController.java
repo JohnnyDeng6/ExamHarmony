@@ -235,6 +235,7 @@ public class AdminController {
         if(authentication != null && authentication.getPrincipal() instanceof CustomUserDetails userDetails){
             EditInterval interval = intervalRepository.findById(1);
             try{
+
                 interval.setTimes(intervalDTO.startDate, intervalDTO.endDate);
                 User admin = userRepository.findByUsername(userDetails.getUsername());
                 model.addAttribute("admin", admin);

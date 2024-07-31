@@ -123,6 +123,11 @@
 
     <style>
 
+        html, body, main{
+            height: 100%;
+            margin: 0;
+        }
+
         .department-container{
             box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
             padding: 30px;
@@ -153,8 +158,6 @@
                         <div class="text-center mb-5">
 
                             <h1 class="display-4">Departments</h1>
-
-
 
                         </div>
                     </div>
@@ -301,7 +304,6 @@
     async function addCourseToUser(event) {
         const courseButton = event.target;
         if(confirm("You are about to add this course to your schedule")){
-            alert(`Course added: ${courseButton.innerText}`);
             const courseName = courseButton.innerText.split(", ")[0].trim();
             const department = courseButton.innerText.split(", ")[0].trim().replace(/[0-9]/g, '');
             const course = { "courseName": courseName, "department": department };
@@ -316,11 +318,12 @@
                 });
                 if (!response.ok) {
                     throw new Error(await response.text());
+                } else {
+                    alert(`Course added: ${courseButton.innerText}`);
                 }
-                feedbackContainer.innerText = courseName + "has been added to your schedule";
 
             } catch (err) {
-                feedbackContainer.innerText = err.message.split("at ca.cmpt276.examharmony")[0];
+                alert(err.message.split("at ca.cmpt276.examharmony")[0]);
             }
         }
     }

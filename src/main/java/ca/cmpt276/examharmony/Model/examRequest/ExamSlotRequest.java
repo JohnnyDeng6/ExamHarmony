@@ -91,7 +91,7 @@ public class ExamSlotRequest implements Comparable<ExamSlotRequest>{
 
     public void setExamDate(String examDate) {
         try{
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
             this.examDate = LocalDateTime.parse(examDate, formatter);
         } catch (DateTimeParseException err){
             throw new RuntimeException("Date could not be parsed, check format and make sure it contains valid characters");
