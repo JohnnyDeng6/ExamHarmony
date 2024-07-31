@@ -13,6 +13,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -48,13 +49,13 @@ public class PasswordResetController {
 
     @PostMapping("/{prefix}/sendPrt")
     @ResponseBody
-    public String sendPasswordResetLink(@PathVariable("prefix") String prefix) {
-        try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-            User user = userDetails.getCurrentUser();
+    public String sendPasswordResetLink(@PathVariable("prefix") String prefix, RedirectAttributes redirectAttributes) throws NoSuchAlgorithmException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        User user = userDetails.getCurrentUser();
 
-            UUID prtUUID = getNewPrt(user);
+        UUID prtUUID = getNewPrt(user);
+        try {
             String toEmail = userDetails.getEmail();
             String subject = "Password Reset Confirmation";
             String body = emailService.buildPasswordResetEmailBody(userDetails.getName(), prtUUID);
@@ -62,14 +63,15 @@ public class PasswordResetController {
 
             return "success";
         } catch (Exception e) {
+            String link = "https://examharmony.onrender.com/reset-password?passwordResetToken=" + prtUUID;
             e.printStackTrace();
-            return "redirect:/login";
+            return "email failed to send, this is a link to reset your password: " + link;
         }
     }
 
     @GetMapping("/forgot-password")
     public String forgotPasswordForm() {
-        return "forgot-password-form";
+        return "general/forgot-password-form";
     }
     @PostMapping("/forgot-password")
     public String getUserForm(@RequestParam("email") String email, @RequestParam("username") String username, Model model) {
