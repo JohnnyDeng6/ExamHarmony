@@ -50,14 +50,14 @@
 
 <body>
 
-<main class="flex-shrink-0 main">
+<main class="flex-shrink-0 main d-flex flex-column min-vh-100">
 
     <header th:insert="fragments/header :: header"></header>
 
     <header class="header" th:text="'Welcome Back, ' + ${instructor.username}"> </header>
 
     <!-- Page Content-->
-    <section class="py-5">
+    <section class="py-5 flex-grow-1">
         <div class="container px-5">
             <h1 class="fw-bolder fs-5 mb-4"> Your Courses </h1>
             <div class="card border-0 shadow rounded-3 overflow-hidden">
@@ -100,11 +100,11 @@
         </div>
         </div>
     </section>
+    <header th:insert="fragments/footer :: footer"></header>
 
 
 </main>
 
-<header th:insert="fragments/footer :: footer"></header>
 
 <!--<header th:insert="fragments/header :: header"></header>-->
 <!--<div class="body">-->

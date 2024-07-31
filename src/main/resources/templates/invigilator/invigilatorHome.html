@@ -47,8 +47,7 @@
 
     </style>
 </head>
-<body>
-<main class="flex-shrink-0 main">
+<main class="flex-shrink-0 main d-flex flex-column min-vh-100">
 
     <header th:insert="fragments/header :: header"></header>
 
@@ -60,7 +59,7 @@
     </div>
 
     <!-- Page Content-->
-    <section class="py-5">
+    <section class="py-5 flex-grow-1">
 
         <header style="margin: 20px" class="header" th:text=" 'Welcome, ' +${invigilatorName} " ></header>
 
@@ -94,7 +93,7 @@
                                             frameborder="0"
                                             scrolling="no">
                                     </iframe>
-
+                                </div>
                             </form>
                         </div>
 
@@ -125,70 +124,11 @@
             </div>
         </div>
     </section>
-
-    <section class="py-5">
-        <div class="container px-5">
-            <div class="card border-0 shadow rounded-3 overflow-hidden main-container">
-                <div class="card-body p-0">
-                    <div class="container pt-3 ">
-
-                        <h2> Appointed Exams </h2>
-
-
-
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+    <footer th:insert="fragments/footer :: footer"></footer>
 
 </main>
 
-<header th:insert="fragments/footer :: footer"></header>
 
-
-<!--    <header th:insert="fragments/header :: header"></header>-->
-
-<!--<div class="body">-->
-
-<!--    <div class="container">-->
-<!--        <header>Welcome Invigilator</header>-->
-<!--        <button class="btn btn-primary calendar">Give Availability</button>-->
-<!--        <button class="btn btn-primary requests">View Requests</button>-->
-
-<!--        &lt;!&ndash; Google Calendar Section &ndash;&gt;-->
-<!--        <div id="calendarSection" class="hidden">-->
-<!--            <h2>Invigilator Calendar</h2>-->
-<!--            <form action="/invigilator/home" method="get">-->
-<!--                <div class="embed-responsive embed-responsive-16by9">-->
-<!--                    <iframe src="https://calendar.google.com/calendar/embed?height=600&wkst=1&ctz=America%2FVancouver&bgcolor=%23ffffff&src=YzBiODQyYTFlYzkxNGFkYjM0NjEyZmM2NTI3NDk4OGZkZjZmNTNmZWM1MTY3ZTYxZDM5NmUzMGJkM2EyYWE0ZkBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&color=%238E24AA" style="border:solid 1px #777" width="800" height="600" frameborder="0" scrolling="no"></iframe>-->
-<!--                </div>-->
-<!--                <div class="submit">-->
-<!--                    <button type="submit" class="btn btn-primary">Submit</button>-->
-<!--                </div>-->
-<!--            </form>-->
-<!--        </div>-->
-
-<!--        &lt;!&ndash; Requests Section &ndash;&gt;-->
-<!--        <div id="requestsSection" class="hidden">-->
-<!--            <h2>Invigilator Requests</h2>-->
-<!--            <div id="requestsList">-->
-<!--                <div th:each="request : ${requests}">-->
-<!--                    <div class="card mb-3" th:id="${'request-' + request.id}">-->
-<!--                        <div class="card-body">-->
-<!--                            <h5 class="card-title">Exam Code: <span th:text="${request.examCode}"></span></h5>-->
-<!--                            <p class="card-text">Date: <span th:text="${request.examDate}"></span></p>-->
-<!--                            <p class="card-text">Status: <span th:text="${request.status}"></span></p>-->
-<!--                            <div class="btn-group" role="group" aria-label="Request Actions">-->
-<!--                                <button type="button" class="btn btn-success accept" th:attr="data-username=${request.username}, data-examcode=${request.examCode}">Accept</button>-->
-<!--                                <button type="button" class="btn btn-danger reject" th:attr="data-username=${request.username}, data-examcode=${request.examCode}, data-requestid=${request.id}">Reject</button>-->
-<!--                            </div>-->
-<!--                        </div>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--            </div>            -->
-<!--        </div>-->
-<!--    </div>-->
     <script>
 
 
