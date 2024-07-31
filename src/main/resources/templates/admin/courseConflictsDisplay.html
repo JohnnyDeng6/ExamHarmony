@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Course Conflicts </title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <link href="/css/styles.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/scripts.js" defer></script>
+
+    <style>
+        .container {
+            text-align: center;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 1200px;
+            width: 100%;
+            margin-bottom: 90px;
+        }
+    </style>
+</head>
+
+<!--<body class = "d-flex flex-column h-100">-->
+<body class="d-flex flex-column min-vh-100">
+<header th:insert="fragments/header :: header"></header>
+
+    <main class="container container-fluid py-5 flex-grow-1">
+        <div class="table-container">
+            <h1>Course Conflicts</h1>
+            <table id="examConflicts" class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Course1</th>
+                        <th>Course2</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="courseConflict : ${courseConflict}">
+                        <td th:text="${courseConflict.id}"></td>
+                        <td th:text="${courseConflict.courseSec1}"></td>
+                        <td th:text="${courseConflict.courseSec2}"></td>
+                        
+                        <td>
+                            <form th:action="@{/admin/courseConflict/select}" method="get" class="edit-form">
+                                <input type="hidden" name="id" th:value="${courseConflict.id}" />
+                            </form>
+                            <form th:action="@{/admin/courseConflict/delete}" method="post" class="delete-form">
+                                <input type="hidden" name="id" th:value="${courseConflict.id}">
+                                <button type="submit" class="btn btn-danger px-3">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <a href="/admin/courseConflict/add" class="btn btn-primary btn-sm px-4 py-2 mb-5">Add</a>
+        </div>
+    </main>
+
+<header th:insert="fragments/footer :: footer"></header>
+</body>
+</html>

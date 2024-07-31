@@ -8,6 +8,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 public interface examSlotRepository extends JpaRepository<examSlot, Integer> {
-    // boolean existsByCourseID(CoursesSec courseID);
+    
     
 }

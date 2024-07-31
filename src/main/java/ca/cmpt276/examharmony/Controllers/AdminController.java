@@ -6,6 +6,7 @@ import ca.cmpt276.examharmony.Model.EditInterval.EditInterval;
 import ca.cmpt276.examharmony.Model.EditInterval.IntervalRepository;
 import ca.cmpt276.examharmony.Model.EditInterval.EditIntervalDTO;
 import ca.cmpt276.examharmony.Model.InvRequests.InvigilatorRequestService;
+import ca.cmpt276.examharmony.Model.courseConflict.courseConflictRepository;
 import ca.cmpt276.examharmony.utils.EmailService;
 import ca.cmpt276.examharmony.Model.examRequest.ExamSlotRequest;
 import ca.cmpt276.examharmony.Model.examRequest.ExamSlotRequestRepository;
@@ -19,7 +20,6 @@ import ca.cmpt276.examharmony.Model.user.UserService;
 import ca.cmpt276.examharmony.utils.CustomUserDetails;
 import ca.cmpt276.examharmony.utils.DatabaseService;
 import ca.cmpt276.examharmony.utils.InstructorExamSlotRepository;
-//import ca.cmpt276.examharmony.utils.PdfService;
 import ca.cmpt276.examharmony.utils.PdfService;
 import jakarta.mail.MessagingException;
 
@@ -33,6 +33,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Iterator;
@@ -44,6 +45,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @Controller
 @RequestMapping("/admin")
 public class AdminController {
+
+    @Autowired
+    private courseConflictRepository conflictRepo;
 
     @Autowired
     private examSlotRepository examRepo;
@@ -161,8 +165,31 @@ public class AdminController {
         return "admin/viewRequests";
     }
 
+    public boolean overlap(LocalDateTime start1, LocalDateTime end1, LocalDateTime start2, LocalDateTime end2) {
+        
+        LocalDate date1Start = start1.toLocalDate();
+        LocalDate date1End = end1.toLocalDate();
+        LocalDate date2Start = start2.toLocalDate();
+        LocalDate date2End = end2.toLocalDate();
+    
+        
+        boolean sameDay = date1Start.equals(date2Start) || date1Start.equals(date2End)
+                          || date1End.equals(date2Start) || date1End.equals(date2End)
+                          || (date2Start.isBefore(date1End) && date1Start.isBefore(date2End));
+    
+        
+        return sameDay;
+    }
+
+    public static LocalDateTime calculateEndTime(LocalDateTime startTime, double durationInHours) {
+        long hours = (long) durationInHours;
+        long minutes = (long) ((durationInHours - hours) * 60);
+        return startTime.plusHours(hours).plusMinutes(minutes);
+    }
+
+
     @PostMapping("/approveRequest")
-    public String approveRequest(@RequestParam Map<String, String> examSlot) {
+    public String approveRequest(@RequestParam Map<String, String> examSlot,RedirectAttributes redirectAttributes) {
 
         int requestId = Integer.parseInt(examSlot.get("requestId"));
 
@@ -182,10 +209,40 @@ public class AdminController {
             exam.setAssignedRooms(examSlot.get("assignedRooms"));
             exam.setStatus(request.getStatus());
         
-            CoursesSec CourseID = courseRepo.findByCourseName(request.getCourseName());
-            exam.setCourseID(CourseID);
+
+            List<CoursesSec> CourseID = courseRepo.findAllByCourseName(request.getCourseName());
+            exam.setCourseID(CourseID.get(0));
         
             examRepo.save(exam);
+
+
+            String courseName = request.getCourseName();
+            Double duration = request.getExamDuration();
+
+            LocalDateTime StartTime= request.getExamDate();
+
+            LocalDateTime EndTime = calculateEndTime(StartTime, duration);
+    
+            List<examSlot> examSlots = examRepo.findAll();
+            
+            for (examSlot exam1 : examSlots){
+                LocalDateTime startTimeExist = exam1.getStartTime();
+                LocalDateTime endTimeExist = calculateEndTime(startTimeExist,exam1.getDuration());
+    
+                if(overlap(StartTime,EndTime,startTimeExist,endTimeExist)){
+                    String course1 = exam1.getCourseID().getCourseName();
+                    String course2 = courseName;
+    
+                    boolean conflictExists = conflictRepo.existsConflict(course1,course2);
+    
+                    if(conflictExists){
+                    
+                        redirectAttributes.addFlashAttribute("errorMessage", "Exam slot added successfully, but a scheduling conflict was detected with the following course(s): "+course1 +" "+course2 +". Please review the schedule.");
+                        break;
+                    }
+                }
+    
+            }
 
             //------------------------------------
             Iterator<ExamSlotRequest> iterator = owner.getExamSlotRequests().iterator();
