@@ -20,6 +20,7 @@ import ca.cmpt276.examharmony.utils.CustomUserDetails;
 import ca.cmpt276.examharmony.utils.DatabaseService;
 import ca.cmpt276.examharmony.utils.InstructorExamSlotRepository;
 //import ca.cmpt276.examharmony.utils.PdfService;
+import ca.cmpt276.examharmony.utils.PdfService;
 import jakarta.mail.MessagingException;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Iterator;
 import java.util.List;
@@ -84,18 +86,18 @@ public class AdminController {
 //    public AdminRequestController(InvigilatorRequestService invigilatorRequestService) {
 //        this.invigilatorRequestService = invigilatorRequestService;
 //    }
-//    @Autowired
-//    private PdfService pdfService;
-//
-//    @GetMapping("/generatePdf")
-//    public ResponseEntity<byte[]> generatePdf() {
-//        byte[] pdfBytes = pdfService.generatePdf();
-//
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=exam_slots.pdf");
-//
-//        return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
-//    }
+    @Autowired
+    private PdfService pdfService;
+
+    @GetMapping("/generatePdf")
+    public ResponseEntity<byte[]> generatePdf() throws IOException {
+        byte[] pdfBytes = pdfService.generatePdf();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=exam_slots.pdf");
+
+        return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
+    }
 
     @GetMapping("/home")
     public String adminTest(Model model){
