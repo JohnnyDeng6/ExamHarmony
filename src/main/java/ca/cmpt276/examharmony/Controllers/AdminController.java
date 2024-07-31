@@ -6,6 +6,7 @@ import ca.cmpt276.examharmony.Model.EditInterval.EditInterval;
 import ca.cmpt276.examharmony.Model.EditInterval.IntervalRepository;
 import ca.cmpt276.examharmony.Model.EditInterval.EditIntervalDTO;
 import ca.cmpt276.examharmony.Model.InvRequests.InvigilatorRequestService;
+import ca.cmpt276.examharmony.Model.courseConflict.courseConflictRepository;
 import ca.cmpt276.examharmony.Model.emailSender.EmailService;
 import ca.cmpt276.examharmony.Model.examRequest.ExamSlotRequest;
 import ca.cmpt276.examharmony.Model.examRequest.ExamSlotRequestRepository;
@@ -29,6 +30,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Iterator;
 import java.util.List;
@@ -41,6 +43,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @Controller
 @RequestMapping("/admin")
 public class AdminController {
+
+    @Autowired
+    private courseConflictRepository conflictRepo;
 
     @Autowired
     private examSlotRepository examRepo;
@@ -146,8 +151,19 @@ public class AdminController {
         return "admin/viewRequests";
     }
 
+    public boolean overlap(LocalDateTime start1, LocalDateTime end1, LocalDateTime start2, LocalDateTime end2) {
+        return start1.isBefore(end2) && start2.isBefore(end1);
+    }
+
+    public static LocalDateTime calculateEndTime(LocalDateTime startTime, double durationInHours) {
+        long hours = (long) durationInHours;
+        long minutes = (long) ((durationInHours - hours) * 60);
+        return startTime.plusHours(hours).plusMinutes(minutes);
+    }
+
+
     @PostMapping("/approveRequest")
-    public String approveRequest(@RequestParam Map<String, String> examSlot) {
+    public String approveRequest(@RequestParam Map<String, String> examSlot,RedirectAttributes redirectAttributes) {
 
         int requestId = Integer.parseInt(examSlot.get("requestId"));
 
@@ -171,6 +187,35 @@ public class AdminController {
             exam.setCourseID(CourseID);
         
             examRepo.save(exam);
+
+
+            String courseName = request.getCourseName();
+            Double duration = request.getExamDuration();
+
+            LocalDateTime StartTime= request.getExamDate();
+
+            LocalDateTime EndTime = calculateEndTime(StartTime, duration);
+    
+            List<examSlot> examSlots = examRepo.findAll();
+            
+            for (examSlot exam1 : examSlots){
+                LocalDateTime startTimeExist = exam1.getStartTime();
+                LocalDateTime endTimeExist = calculateEndTime(startTimeExist,exam1.getDuration());
+    
+                if(overlap(StartTime,EndTime,startTimeExist,endTimeExist)){
+                    String course1 = exam1.getCourseID().getCourseName();
+                    String course2 = courseName;
+    
+                    boolean conflictExists = conflictRepo.existsConflict(course1,course2);
+    
+                    if(conflictExists){
+                    
+                        redirectAttributes.addFlashAttribute("errorMessage", "Exam slot added successfully, but a scheduling conflict was detected with the following course(s): "+course1 +" "+course2 +". Please review the schedule.");
+                        break;
+                    }
+                }
+    
+            }
 
             //------------------------------------
             Iterator<ExamSlotRequest> iterator = owner.getExamSlotRequests().iterator();
