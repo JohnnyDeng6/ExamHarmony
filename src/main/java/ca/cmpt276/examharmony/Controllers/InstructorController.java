@@ -231,25 +231,26 @@ public class InstructorController {
         if(authentication != null && authentication.getPrincipal() instanceof CustomUserDetails userDetails){
             User currentUser = userRepo.findByUsername(userDetails.getUsername());
             CoursesSec course = CoursesSec.CreateNewCourse(newCourse.department, newCourse.courseName);
-            List<User> instructors = userRepo.findByRoleName("INSTRUCTOR");
 
             System.out.println(currentUser);
 
             Set<CoursesSec> instructorCourses = currentUser.getInstructorCourses();
             for(CoursesSec currentCourse: instructorCourses){
                 if(currentCourse.getCourseName().equals(course.getCourseName())){
-                    throw new BadRequest("You already have this Course");
+                    throw new BadRequest("You are already teaching this Course");
                 }
             }
 
-            for(User user : instructors){
-                Set<CoursesSec> courses = user.getInstructorCourses();
-                for(CoursesSec courseSec : courses){
-                    if(courseSec.getCourseName().equals(course.getCourseName())){
-                        throw new BadRequest("Another instructor is teaching this course");
-                    }
-                }
-            }
+//            List<User> instructors = userRepo.findByRoleName("INSTRUCTOR");
+//
+//            for(User user : instructors){
+//                Set<CoursesSec> courses = user.getInstructorCourses();
+//                for(CoursesSec courseSec : courses){
+//                    if(courseSec.getCourseName().equals(course.getCourseName())){
+//                        throw new BadRequest("Another instructor is teaching this course");
+//                    }
+//                }
+//            }
 
             courseRepo.save(course);
             currentUser.addCourse(course);
