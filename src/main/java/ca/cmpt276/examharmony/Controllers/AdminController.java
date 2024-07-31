@@ -189,17 +189,18 @@ public class AdminController {
 
     @GetMapping("/viewInstructors")
     public String viewInstructors(Model model) {
-        List<User> instructors = userRepository.findByRoleName("INSTRUCTOR");
-    
-        // Fetch and set exam slot requests for each instructor
-        for (User instructor : instructors) {
-            List<ExamSlotRequest> requests = insService.getRequests(instructor.getUsername());
-            instructor.setExamSlotRequests(requests); // Using your provided setter method
-        }
-    
-        model.addAttribute("instructors", instructors);
-        return "admin/viewInstructors";
+    List<User> instructors = userRepository.findByRoleName("INSTRUCTOR");
+
+    // Fetch and set exam slot requests for each instructor
+    for (User instructor : instructors) {
+        List<ExamSlotRequest> examSlotRequests = examRequestRepository.findByInstructorName(instructor.getUsername());
+        instructor.setExamSlotRequests(examSlotRequests); // Assuming a setter method exists in User class
+       // model.addAttribute("instructors", instructors);
     }
+
+    model.addAttribute("instructors", instructors);
+    return "admin/viewInstructors";
+}
     
 
 
