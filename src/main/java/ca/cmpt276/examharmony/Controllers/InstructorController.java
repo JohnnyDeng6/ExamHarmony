@@ -94,7 +94,7 @@ public class InstructorController {
     @PostMapping("/instructor/examslots/edit/{courseName}")
     public String submitData(@RequestBody List<ExamSlotRequestDTO> examSlotRequestDTOList, Model model, @PathVariable("courseName") String courseName) {
         if (examSlotRequestDTOList.isEmpty()) {
-            return "redirect:/instructor/examslots/" + courseName;
+            throw new BadRequest("At least 1 exam date must be entered");
         }
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !(authentication.getPrincipal() instanceof CustomUserDetails userDetails)) {
