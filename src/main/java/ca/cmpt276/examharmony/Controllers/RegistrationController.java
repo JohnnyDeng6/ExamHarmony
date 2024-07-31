@@ -45,11 +45,11 @@ import java.util.UUID;
                 String body = buildWelcomeEmailBody(registrationDto, prtUUID);
                 emailService.sendHtmlEmail(toEmail, subject, body);
 
-                //if role is inv then share or admin
-                if (registrationDto.getRoles().contains("INVIGILATOR") || registrationDto.getRoles().contains("ADMIN")) {
-                    String calendarId = "examharmony6@gmail.com";
-                    calendarManagementService.shareCalendarWithUser(calendarId, toEmail);
-                }
+//                //if role is inv then share or admin
+//                if (registrationDto.getRoles().contains("INVIGILATOR") || registrationDto.getRoles().contains("ADMIN")) {
+//                    String calendarId = "examharmony6@gmail.com";
+//                    calendarManagementService.shareCalendarWithUser(calendarId, toEmail);
+//                }
 
             } catch (UserAlreadyExistException uaeEx) {
                 redirectAttributes.addFlashAttribute("alertMessage", "Account already exists, please choose another email or username");
