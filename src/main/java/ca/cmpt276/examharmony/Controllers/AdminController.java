@@ -6,7 +6,7 @@ import ca.cmpt276.examharmony.Model.EditInterval.EditInterval;
 import ca.cmpt276.examharmony.Model.EditInterval.IntervalRepository;
 import ca.cmpt276.examharmony.Model.EditInterval.EditIntervalDTO;
 import ca.cmpt276.examharmony.Model.InvRequests.InvigilatorRequestService;
-import ca.cmpt276.examharmony.Model.emailSender.EmailService;
+import ca.cmpt276.examharmony.utils.EmailService;
 import ca.cmpt276.examharmony.Model.examRequest.ExamSlotRequest;
 import ca.cmpt276.examharmony.Model.examRequest.ExamSlotRequestRepository;
 import ca.cmpt276.examharmony.Model.examSlot.examSlot;
@@ -38,8 +38,6 @@ import java.time.LocalDateTime;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import ca.cmpt276.examharmony.Model.roles.RoleRepository;
 
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
