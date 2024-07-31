@@ -301,7 +301,6 @@
     async function addCourseToUser(event) {
         const courseButton = event.target;
         if(confirm("You are about to add this course to your schedule")){
-            alert(`Course added: ${courseButton.innerText}`);
             const courseName = courseButton.innerText.split(", ")[0].trim();
             const department = courseButton.innerText.split(", ")[0].trim().replace(/[0-9]/g, '');
             const course = { "courseName": courseName, "department": department };
@@ -316,11 +315,12 @@
                 });
                 if (!response.ok) {
                     throw new Error(await response.text());
+                } else {
+                    alert(`Course added: ${courseButton.innerText}`);
                 }
-                feedbackContainer.innerText = courseName + "has been added to your schedule";
 
             } catch (err) {
-                feedbackContainer.innerText = err.message.split("at ca.cmpt276.examharmony")[0];
+                alert(err.message.split("at ca.cmpt276.examharmony")[0]);
             }
         }
     }

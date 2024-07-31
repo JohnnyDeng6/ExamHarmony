@@ -208,10 +208,14 @@ public class InstructorController {
 
     @PostMapping("/instructor/get/departments")
     public String getDepartments(Model model, @RequestBody List<DepartmentDTO> departments) {
-        this.departments.clear();
-        this.departments.addAll(departments);
-        model.addAttribute("departmentInfo", this.departments);
-        return "instructor/department-selection";
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if(authentication != null && authentication.getPrincipal() instanceof CustomUserDetails userDetails){
+            this.departments.clear();
+            this.departments.addAll(departments);
+            model.addAttribute("departmentInfo", this.departments);
+            return "instructor/department-selection";
+        }
+        return "redirect:/login";
     }
 
     @GetMapping("/instructor/view/departments/{semester}")
@@ -227,12 +231,26 @@ public class InstructorController {
         if(authentication != null && authentication.getPrincipal() instanceof CustomUserDetails userDetails){
             User currentUser = userRepo.findByUsername(userDetails.getUsername());
             CoursesSec course = CoursesSec.CreateNewCourse(newCourse.department, newCourse.courseName);
+            List<User> instructors = userRepo.findByRoleName("INSTRUCTOR");
+
+            System.out.println(currentUser);
+
             Set<CoursesSec> instructorCourses = currentUser.getInstructorCourses();
             for(CoursesSec currentCourse: instructorCourses){
                 if(currentCourse.getCourseName().equals(course.getCourseName())){
                     throw new BadRequest("You already have this Course");
                 }
             }
+
+            for(User user : instructors){
+                Set<CoursesSec> courses = user.getInstructorCourses();
+                for(CoursesSec courseSec : courses){
+                    if(courseSec.getCourseName().equals(course.getCourseName())){
+                        throw new BadRequest("Another instructor is teaching this course");
+                    }
+                }
+            }
+
             courseRepo.save(course);
             currentUser.addCourse(course);
             userRepo.save(currentUser);
